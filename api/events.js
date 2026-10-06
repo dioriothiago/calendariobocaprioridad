@@ -1,7 +1,8 @@
 // Función serverless de Vercel. Guarda los eventos en Upstash Redis (Vercel Marketplace).
 const URL_ = process.env.CALENDARIO_KV_REST_API_URL || process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
 const TOKEN = process.env.CALENDARIO_KV_REST_API_TOKEN || process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-const AREAS = ["PLACA", "REEL", "REDACCIÓN"];
+const AREAS = ["Placa", "Reel", "Redacción"];
+const norm = (x) => String(x || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 async function redis(cmd) {
   const r = await fetch(URL_, {
@@ -33,10 +34,21 @@ module.exports = async (req, res) => {
         date,
         title,
         time: /^\d{2}:\d{2}$/.test(body.time || "") ? body.time : "",
-        area: AREAS.includes(body.area) ? body.area : "",
+        area: AREAS.find((a) => norm(a) === norm(body.area)) || "",
+        done: false,
       };
       await redis(["RPUSH", "events", JSON.stringify(ev)]);
       return res.status(201).json(ev);
+    }
+
+    if (req.method === "PATCH") {
+      const raw = await redis(["LRANGE", "events", 0, -1]);
+      const i = raw.findIndex((x) => JSON.parse(x).id === body.id);
+      if (i < 0) return res.status(404).json({ error: "Evento no encontrado" });
+      const ev = JSON.parse(raw[i]);
+      ev.done = !!body.done;
+      await redis(["LSET", "events", i, JSON.stringify(ev)]);
+      return res.status(200).json(ev);
     }
 
     if (req.method === "DELETE") {
