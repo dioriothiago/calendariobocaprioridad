@@ -1,6 +1,6 @@
 // Función serverless de Vercel. Guarda los eventos en Upstash Redis (Vercel Marketplace).
-const URL_ = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-const TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+const URL_ = process.env.CALENDARIO_KV_REST_API_URL || process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+const TOKEN = process.env.CALENDARIO_KV_REST_API_TOKEN || process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
 const AREAS = ["Placa", "REEL", "Redacción"];
 
 async function redis(cmd) {
