@@ -190,7 +190,11 @@ function render() {
   });
 
   document.querySelectorAll(".area").forEach((b) => b.setAttribute("aria-pressed", b.dataset.a === area));
-  $("notif").style.display = "Notification" in window && Notification.permission === "default" ? "" : "none";
+  const n = $("notif");
+  if (!("Notification" in window)) n.textContent = "Avisos no disponibles acá. En iPhone, agregá la página a la pantalla de inicio.";
+  else if (Notification.permission === "granted") n.textContent = "Aviso del día anterior activado ✓";
+  else if (Notification.permission === "denied") n.textContent = "Avisos bloqueados. Activalos en los ajustes del navegador.";
+  else n.textContent = "Activar aviso del día anterior";
 }
 
 document.querySelectorAll(".area").forEach((b) => (b.onclick = () => { area = b.dataset.a; localStorage.setItem("area", area); render(); }));
@@ -209,7 +213,7 @@ $("save").onclick = async () => {
   $("save").disabled = false;
 };
 
-$("notif").onclick = async () => { await Notification.requestPermission(); render(); maybeNotify(); };
+$("notif").onclick = async () => { if ("Notification" in window && Notification.permission === "default") { await Notification.requestPermission(); render(); maybeNotify(); } };
 
 // Aviso: a partir de las 20:00, si mañana hay planes, avisa una vez por día (con la página abierta).
 function maybeNotify() {
