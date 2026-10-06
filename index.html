@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0a1a3f;--card:#112659;--ink:#f4f6fb;--mute:#9fb0d9;--line:#25397a;--gold:#f0a30a;--navy:#0a1a3f;
---placa:#22c55e;--reel:#ef4444;--redac:#a78bfa}
+--placa:#22c55e;--reel:#ef4444;--redac:#a78bfa;--none:#6f7fa8}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,sans-serif;padding:max(16px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom));min-height:100%}
@@ -32,9 +32,12 @@ button{font:inherit;cursor:pointer}
 .dot{width:10px;height:10px;border-radius:50%;flex:none;background:var(--mute)}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:14px}
 .panel h3{margin:0 0 10px;font-size:18px;text-transform:capitalize}
-.ev{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
-.ev .l{display:flex;gap:10px;align-items:center;min-width:0}
-.ev small{color:var(--mute);display:block}
+.ev{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.ev input[type=checkbox]{width:24px;height:24px;margin:0;padding:0;accent-color:var(--gold);cursor:pointer}
+.ev .body{min-width:0}
+.ev .t{display:flex;align-items:center;gap:8px;overflow-wrap:anywhere}
+.ev small{color:var(--mute);display:block;margin-top:3px}
+.ev.done .tt{text-decoration:line-through;opacity:.55}
 .ev .x{background:none;border:0;color:var(--mute);font-size:18px}
 .empty{color:var(--mute);margin:0 0 10px}
 .add{display:grid;gap:8px;margin-top:12px}
@@ -67,7 +70,7 @@ input{font:inherit;font-size:16px;padding:11px 12px;border-radius:10px;border:1p
       <input id="title" placeholder="¿Qué se arma?" maxlength="80">
       <div class="areas" role="group" aria-label="Área">
         <button type="button" class="area" data-a="Placa" style="--c:var(--placa)">Placa</button>
-        <button type="button" class="area" data-a="REEL" style="--c:var(--reel)">REEL</button>
+        <button type="button" class="area" data-a="Reel" style="--c:var(--reel)">Reel</button>
         <button type="button" class="area" data-a="Redacción" style="--c:var(--redac)">Redacción</button>
       </div>
       <input id="time" type="time" aria-label="Hora (opcional)">
@@ -83,14 +86,17 @@ const pad = (n) => String(n).padStart(2, "0");
 const key = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const parse = (k) => { const [y, m, d] = k.split("-").map(Number); return new Date(y, m - 1, d); };
 const fmt = (k) => parse(k).toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
-const COLORS = { "Placa": "var(--placa)", "REEL": "var(--reel)", "Redacción": "var(--redac)" };
-const colorOf = (e) => COLORS[e.area] || "var(--mute)";
+const AREAS = ["Placa", "Reel", "Redacción"];
+const COLORS = { "Placa": "var(--placa)", "Reel": "var(--reel)", "Redacción": "var(--redac)" };
+const strip = (s) => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const canon = (a) => AREAS.find((x) => strip(x) === strip(a)) || "";
+const colorOf = (e) => COLORS[e.area] || "var(--none)";
 
 let events = [];
 const today = new Date();
 let cursor = new Date(today.getFullYear(), today.getMonth(), 1);
 let selected = key(today);
-let area = localStorage.getItem("area") || "Placa";
+let area = canon(localStorage.getItem("area")) || "Placa";
 const tomorrowKey = () => { const t = new Date(); t.setDate(t.getDate() + 1); return key(t); };
 
 // Llama a la API y devuelve un error claro aunque el servidor responda algo que no es JSON.
@@ -108,7 +114,7 @@ async function api(method, body) {
 
 async function load() {
   try {
-    events = await api("GET");
+    events = (await api("GET")).map((e) => ({ ...e, area: canon(e.area) }));
     $("err").textContent = "";
   } catch (e) { $("err").textContent = "No se pudieron cargar los eventos: " + e.message; }
   render();
@@ -158,12 +164,20 @@ function render() {
   if (!evs.length) list.innerHTML = `<p class="empty">Todavía no hay nada. Sumá el primer plan.</p>`;
   evs.forEach((e) => {
     const row = document.createElement("div");
-    row.className = "ev";
-    const l = document.createElement("div");
-    l.className = "l";
-    l.innerHTML = `<span class="dot" style="background:${colorOf(e)}"></span><div><span></span><small></small></div>`;
-    l.querySelector("div > span").textContent = e.title;
-    l.querySelector("small").textContent = [e.time, e.area || e.author].filter(Boolean).join(" · ");
+    row.className = "ev" + (e.done ? " done" : "");
+    const cb = document.createElement("input");
+    cb.type = "checkbox"; cb.checked = !!e.done; cb.setAttribute("aria-label", "Marcar como hecha");
+    cb.onchange = async () => {
+      const prev = !!e.done;
+      e.done = cb.checked; render();
+      try { await api("PATCH", { id: e.id, done: e.done }); $("err").textContent = ""; }
+      catch (er) { e.done = prev; render(); $("err").textContent = "No se pudo actualizar: " + er.message; }
+    };
+    const body = document.createElement("div");
+    body.className = "body";
+    body.innerHTML = `<div class="t"><span class="dot" style="background:${colorOf(e)}"></span><span class="tt"></span></div><small></small>`;
+    body.querySelector(".tt").textContent = e.title;
+    body.querySelector("small").textContent = [e.time, e.area || e.author].filter(Boolean).join(" · ");
     const x = document.createElement("button");
     x.className = "x"; x.textContent = "✕"; x.setAttribute("aria-label", "Borrar evento");
     x.onclick = async () => {
@@ -171,7 +185,7 @@ function render() {
       try { await api("DELETE", { id: e.id }); } catch (er) { $("err").textContent = "No se pudo borrar: " + er.message; return; }
       load();
     };
-    row.append(l, x);
+    row.append(cb, body, x);
     list.appendChild(row);
   });
 
