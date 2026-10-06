@@ -2,51 +2,57 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Calendario de la banda</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calendario Boca Prioridad</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📅</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#eef1f6;--card:#fff;--ink:#14213d;--mute:#6b7690;--line:#d9deea;--accent:#ff5a4f;--today:#f5c518}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1626;--card:#18223a;--ink:#eef1f8;--mute:#93a0ba;--line:#2a3654}}
+:root{--bg:#0a1a3f;--card:#112659;--ink:#f4f6fb;--mute:#9fb0d9;--line:#25397a;--gold:#f0a30a;--navy:#0a1a3f;
+--placa:#22c55e;--reel:#ef4444;--redac:#a78bfa}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,sans-serif;padding:max(16px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom));min-height:100%}
 main{max-width:520px;margin:0 auto}
-h1{font-size:28px;font-weight:800;margin:0 0 14px;letter-spacing:-.02em}
-.banner{background:var(--accent);color:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px}
-.banner b{font-size:17px}.banner ul{margin:6px 0 0;padding-left:18px}
+h1{font-size:28px;font-weight:800;margin:0 0 14px;letter-spacing:-.02em;color:var(--gold)}
+.banner{background:var(--gold);color:var(--navy);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.banner b{font-size:17px}.banner ul{margin:6px 0 0;padding:0;list-style:none}
+.banner li{display:flex;align-items:center;gap:8px;padding:2px 0}
 .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .bar h2{margin:0;font-size:20px;text-transform:capitalize}
 button{font:inherit;cursor:pointer}
 .nav{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:10px;width:40px;height:40px;font-size:18px}
 .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .dow{font-size:12px;color:var(--mute);text-align:center;padding:4px 0}
-.day{aspect-ratio:1;background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:15px;position:relative}
+.day{aspect-ratio:1;background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:15px}
 .day.out{visibility:hidden}
-.day.today{background:var(--today);border-color:var(--today);color:#14213d;font-weight:800}
-.day.tmr{outline:2px solid var(--accent)}
-.day.sel{outline:3px solid var(--ink)}
-.dots{display:flex;gap:2px;height:6px}.dots i{width:6px;height:6px;border-radius:50%;background:var(--accent)}
-.day.today .dots i{background:#14213d}
+.day.today{background:var(--gold);border-color:var(--gold);color:var(--navy);font-weight:800}
+.day.tmr{outline:2px solid var(--gold)}
+.day.sel{outline:3px solid #fff}
+.dots{display:flex;gap:2px;height:6px}.dots i{width:6px;height:6px;border-radius:50%;background:var(--mute)}
+.dot{width:10px;height:10px;border-radius:50%;flex:none;background:var(--mute)}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:14px}
 .panel h3{margin:0 0 10px;font-size:18px;text-transform:capitalize}
-.ev{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.ev{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.ev .l{display:flex;gap:10px;align-items:center;min-width:0}
 .ev small{color:var(--mute);display:block}
 .ev .x{background:none;border:0;color:var(--mute);font-size:18px}
 .empty{color:var(--mute);margin:0 0 10px}
 .add{display:grid;gap:8px;margin-top:12px}
 .add .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-input{font:inherit;font-size:16px;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
-.go{background:var(--ink);color:var(--bg);border:0;border-radius:10px;padding:12px;font-weight:600}
+input{font:inherit;font-size:16px;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%;color-scheme:dark}
+.areas{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.area{background:transparent;border:2px solid var(--c);color:var(--c);border-radius:10px;padding:10px 4px;font-weight:600}
+.area[aria-pressed=true]{background:var(--c);color:#fff}
+.go{background:var(--gold);color:var(--navy);border:0;border-radius:10px;padding:12px;font-weight:800}
+.go:disabled{opacity:.6}
 .link{background:none;border:0;color:var(--mute);text-decoration:underline;padding:12px 0 0;font-size:14px}
-.err{color:var(--accent);font-size:14px;margin:6px 0 0}
-:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.err{color:#ffb4a8;font-size:14px;margin:6px 0 0}
+:focus-visible{outline:3px solid #fff;outline-offset:2px}
 </style>
 </head>
 <body>
 <main>
-  <h1>Calendario de la banda</h1>
+  <h1>Calendario Boca Prioridad</h1>
   <div id="banner"></div>
   <div class="bar">
     <button class="nav" id="prev" aria-label="Mes anterior">‹</button>
@@ -59,10 +65,12 @@ input{font:inherit;font-size:16px;padding:11px 12px;border-radius:10px;border:1p
     <div id="list"></div>
     <div class="add">
       <input id="title" placeholder="¿Qué se arma?" maxlength="80">
-      <div class="row">
-        <input id="time" type="time" aria-label="Hora">
-        <input id="author" placeholder="Tu nombre" maxlength="30">
+      <div class="areas" role="group" aria-label="Área">
+        <button type="button" class="area" data-a="Placa" style="--c:var(--placa)">Placa</button>
+        <button type="button" class="area" data-a="REEL" style="--c:var(--reel)">REEL</button>
+        <button type="button" class="area" data-a="Redacción" style="--c:var(--redac)">Redacción</button>
       </div>
+      <input id="time" type="time" aria-label="Hora (opcional)">
       <button class="go" id="save">Agregar al día</button>
       <p class="err" id="err" role="alert"></p>
     </div>
@@ -75,33 +83,57 @@ const pad = (n) => String(n).padStart(2, "0");
 const key = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const parse = (k) => { const [y, m, d] = k.split("-").map(Number); return new Date(y, m - 1, d); };
 const fmt = (k) => parse(k).toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
+const COLORS = { "Placa": "var(--placa)", "REEL": "var(--reel)", "Redacción": "var(--redac)" };
+const colorOf = (e) => COLORS[e.area] || "var(--mute)";
 
 let events = [];
 const today = new Date();
 let cursor = new Date(today.getFullYear(), today.getMonth(), 1);
 let selected = key(today);
+let area = localStorage.getItem("area") || "Placa";
 const tomorrowKey = () => { const t = new Date(); t.setDate(t.getDate() + 1); return key(t); };
+
+// Llama a la API y devuelve un error claro aunque el servidor responda algo que no es JSON.
+async function api(method, body) {
+  let r, txt;
+  try {
+    r = await fetch("/api/events", { method, headers: { "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
+    txt = await r.text();
+  } catch { throw new Error("sin conexión con el servidor"); }
+  let j;
+  try { j = JSON.parse(txt); } catch { throw new Error(`el servidor no respondió bien (código ${r.status})`); }
+  if (!r.ok) throw new Error(j.error || `error ${r.status}`);
+  return j;
+}
 
 async function load() {
   try {
-    const r = await fetch("/api/events");
-    const j = await r.json();
-    if (!r.ok) throw new Error(j.error);
-    events = j;
+    events = await api("GET");
     $("err").textContent = "";
-  } catch (e) { $("err").textContent = "No se pudo cargar: " + e.message; }
+  } catch (e) { $("err").textContent = "No se pudieron cargar los eventos: " + e.message; }
   render();
   maybeNotify();
 }
 
 const byDay = (k) => events.filter((e) => e.date === k).sort((a, b) => (a.time || "99").localeCompare(b.time || "99"));
-const line = (e) => `${e.time ? e.time + " · " : ""}${e.title}${e.author ? " (" + e.author + ")" : ""}`;
+const label = (e) => `${e.time ? e.time + " · " : ""}${e.title}`;
 
 function render() {
   const t = byDay(tomorrowKey());
-  $("banner").innerHTML = t.length
-    ? `<div class="banner"><b>Mañana hay ${t.length === 1 ? "1 plan" : t.length + " planes"}</b><ul>${t.map((e) => `<li></li>`).join("")}</ul></div>` : "";
-  if (t.length) [...$("banner").querySelectorAll("li")].forEach((li, i) => (li.textContent = line(t[i])));
+  const bn = $("banner");
+  bn.innerHTML = "";
+  if (t.length) {
+    const box = document.createElement("div");
+    box.className = "banner";
+    box.innerHTML = `<b>Mañana ${t.length === 1 ? "hay 1 plan" : "hay " + t.length + " planes"}</b><ul></ul>`;
+    t.forEach((e) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<span class="dot" style="background:${colorOf(e)}"></span><span></span>`;
+      li.lastChild.textContent = label(e) + (e.area ? ` (${e.area})` : "");
+      box.querySelector("ul").appendChild(li);
+    });
+    bn.appendChild(box);
+  }
 
   $("month").textContent = cursor.toLocaleDateString("es-AR", { month: "long", year: "numeric" });
   const g = $("grid");
@@ -111,10 +143,10 @@ function render() {
   for (let i = 0; i < offset; i++) g.insertAdjacentHTML("beforeend", `<div class="day out"></div>`);
   for (let d = 1; d <= days; d++) {
     const k = key(new Date(cursor.getFullYear(), cursor.getMonth(), d));
-    const n = Math.min(byDay(k).length, 3);
+    const dots = byDay(k).slice(0, 3).map((e) => `<i style="background:${colorOf(e)}"></i>`).join("");
     const b = document.createElement("button");
     b.className = "day" + (k === key(today) ? " today" : "") + (k === tomorrowKey() ? " tmr" : "") + (k === selected ? " sel" : "");
-    b.innerHTML = `${d}<span class="dots">${"<i></i>".repeat(n)}</span>`;
+    b.innerHTML = `${d}<span class="dots">${dots}</span>`;
     b.onclick = () => { selected = k; render(); };
     g.appendChild(b);
   }
@@ -127,36 +159,37 @@ function render() {
   evs.forEach((e) => {
     const row = document.createElement("div");
     row.className = "ev";
-    const info = document.createElement("div");
-    info.innerHTML = "<span></span><small></small>";
-    info.firstChild.textContent = e.title;
-    info.lastChild.textContent = [e.time, e.author].filter(Boolean).join(" · ");
+    const l = document.createElement("div");
+    l.className = "l";
+    l.innerHTML = `<span class="dot" style="background:${colorOf(e)}"></span><div><span></span><small></small></div>`;
+    l.querySelector("div > span").textContent = e.title;
+    l.querySelector("small").textContent = [e.time, e.area || e.author].filter(Boolean).join(" · ");
     const x = document.createElement("button");
     x.className = "x"; x.textContent = "✕"; x.setAttribute("aria-label", "Borrar evento");
     x.onclick = async () => {
       if (!confirm("¿Borrar este evento?")) return;
-      await fetch("/api/events", { method: "DELETE", body: JSON.stringify({ id: e.id }) });
+      try { await api("DELETE", { id: e.id }); } catch (er) { $("err").textContent = "No se pudo borrar: " + er.message; return; }
       load();
     };
-    row.append(info, x);
+    row.append(l, x);
     list.appendChild(row);
   });
+
+  document.querySelectorAll(".area").forEach((b) => b.setAttribute("aria-pressed", b.dataset.a === area));
   $("notif").style.display = "Notification" in window && Notification.permission === "default" ? "" : "none";
 }
 
+document.querySelectorAll(".area").forEach((b) => (b.onclick = () => { area = b.dataset.a; localStorage.setItem("area", area); render(); }));
 $("prev").onclick = () => { cursor.setMonth(cursor.getMonth() - 1); render(); };
 $("next").onclick = () => { cursor.setMonth(cursor.getMonth() + 1); render(); };
-$("author").value = localStorage.getItem("author") || "";
 
 $("save").onclick = async () => {
   const title = $("title").value.trim();
   if (!title) { $("err").textContent = "Escribí qué se arma."; return; }
-  localStorage.setItem("author", $("author").value);
   $("save").disabled = true;
   try {
-    const r = await fetch("/api/events", { method: "POST", body: JSON.stringify({ date: selected, title, time: $("time").value, author: $("author").value }) });
-    if (!r.ok) throw new Error((await r.json()).error);
-    $("title").value = ""; $("time").value = ""; $("err").textContent = "";
+    await api("POST", { date: selected, title, time: $("time").value, area });
+    $("title").value = ""; $("time").value = "";
     await load();
   } catch (e) { $("err").textContent = "No se pudo guardar: " + e.message; }
   $("save").disabled = false;
@@ -172,7 +205,7 @@ function maybeNotify() {
   const flag = "notified-" + tomorrowKey();
   if (!t.length || localStorage.getItem(flag)) return;
   localStorage.setItem(flag, "1");
-  new Notification("Mañana hay planes", { body: t.map(line).join("\n") });
+  new Notification("Mañana hay planes", { body: t.map((e) => label(e) + (e.area ? ` (${e.area})` : "")).join("\n") });
 }
 
 load();
